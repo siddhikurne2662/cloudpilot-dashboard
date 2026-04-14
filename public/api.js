@@ -47,7 +47,7 @@ export const api = {
   // Workflows
   getWorkflows:       ()         => request('/api/workflows'),
   getWorkflow:        (id)       => request(`/api/workflows/${id}`),
-  runWorkflow:        (id)       => request(`/api/workflows/${id}/run`, 'POST'),
+  runWorkflow:        (id, payload) => request(`/api/workflows/${id}/run`, 'POST', payload || {}),
   toggleWorkflow:     (id, act)  => request(`/api/workflows/${id}/toggle`, 'POST', { active: act }),
   deleteWorkflow:     (id)       => request(`/api/workflows/${id}`, 'DELETE'),
   getWorkflowHistory: (id)       => request(`/api/workflows/${id}/history`),
@@ -58,8 +58,9 @@ export const api = {
   deleteCredential: (id)   => request(`/api/credentials/${id}`, 'DELETE'),
 
   // Templates
-  getTemplates:    ()     => request('/api/templates'),
-  importTemplate:  (data) => request('/api/templates/import', 'POST', data),
+  getTemplates:       ()     => request('/api/templates'),
+  importTemplate:     (data) => request('/api/templates/import', 'POST', data),
+  installFromStorage: (data) => request('/api/templates/install-from-storage', 'POST', data),
 
   // Executions
   getExecutions:  ()   => request('/api/executions'),

@@ -1,4 +1,5 @@
 // public/ui.js - Shared UI utilities
+
 export function showModal(title, content) {
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalBody').innerHTML = content;
@@ -14,7 +15,7 @@ export function setPageHeader(title, subtitle) {
   const h1 = document.querySelector('.page-header h1');
   const p = document.querySelector('.page-header p');
   if (h1) h1.textContent = title;
-  if (p) p.textContent = subtitle;
+  if (p) p.textContent = subtitle || '';
 }
 
 export function setTopActions(html) {
@@ -22,37 +23,81 @@ export function setTopActions(html) {
   if (el) el.innerHTML = html;
 }
 
-// Toast notification system
-let _toastTimeout;
-export function showToast(message, type = 'info') {
-  let toast = document.getElementById('toastNotification');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toastNotification';
-    document.body.appendChild(toast);
-  }
+// ─────────────────────────────────────────────
+// Toast system — stacked, top-right, light-themed
+// Types: success | error | info | warning
+// ─────────────────────────────────────────────
+let _toastContainer = null;
 
-  const icons = { success: 'check-circle', error: 'exclamation-circle', info: 'info-circle' };
-  toast.className = `toast toast-${type} show`;
-  toast.innerHTML = `<i class="fas fa-${icons[type] || 'info-circle'}"></i><span>${message}</span>`;
-
-  clearTimeout(_toastTimeout);
-  _toastTimeout = setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3500);
+function getToastContainer() {
+  if (_toastContainer && document.body.contains(_toastContainer)) return _toastContainer;
+  _toastContainer = document.createElement('div');
+  _toastContainer.id = 'toastContainer';
+  document.body.appendChild(_toastContainer);
+  return _toastContainer;
 }
 
-// Update active nav item
+export function showToast(message, type = 'info', duration = 3500) {
+  const container = getToastContainer();
+
+  const icons = {
+    success: 'check-circle',
+    error:   'exclamation-circle',
+    info:    'info-circle',
+    warning: 'exclamation-triangle',
+  };
+
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `
+    <i class="fas fa-${icons[type] || 'info-circle'}"></i>
+    <span>${message}</span>
+    <button onclick="this.parentElement.remove()" style="
+      background:none;border:none;cursor:pointer;
+      color:inherit;opacity:0.5;font-size:14px;
+      padding:0 0 0 4px;line-height:1;
+    "><i class="fas fa-times"></i></button>
+  `;
+
+  container.appendChild(toast);
+
+  // Trigger show animation on next frame
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => toast.classList.add('show'));
+  });
+
+  // Auto-dismiss
+  const timer = setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => { if (toast.parentElement) toast.remove(); }, 300);
+  }, duration);
+
+  // Click to dismiss early
+  toast.addEventListener('click', (e) => {
+    if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
+      clearTimeout(timer);
+      toast.classList.remove('show');
+      setTimeout(() => { if (toast.parentElement) toast.remove(); }, 300);
+    }
+  });
+}
+
+// ─────────────────────────────────────────────
+// Active nav
+// ─────────────────────────────────────────────
 export function setActiveNav(routeName) {
   document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
 
   const navMap = {
-    dashboard: 'Dashboard',
-    templates: 'Templates',
-    credentials: 'Credentials',
-    settings: 'Settings',
-    execution: 'Dashboard',
-    workflow: 'Dashboard',
+    dashboard:    'Dashboard',
+    workflows:    'Workflows',
+    'run-history':'Executions',
+    executions:   'Run History',
+    templates:    'Templates',
+    credentials:  'Credentials',
+    settings:     'Settings',
+    execution:    'Dashboard',
+    workflow:     'Dashboard',
   };
 
   const targetText = navMap[routeName] || 'Dashboard';

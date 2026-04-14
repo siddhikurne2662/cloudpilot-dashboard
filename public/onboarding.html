@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome to CloudPilot — Setup</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" crossorigin="anonymous">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./styles.css">
+
+<style>
+  /* ── Onboarding page layout ── */
+  body {
+    background: var(--sidebar-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px 16px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(99,102,241,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,102,241,0.035) 1px, transparent 1px);
+    background-size: 48px 48px;
+    animation: gridDrift 50s linear infinite;
+  }
+  @keyframes gridDrift { 0%{transform:translate(0,0);} 100%{transform:translate(48px,48px);} }
+
+  .ob { position: fixed; border-radius: 50%; filter: blur(90px); pointer-events: none; z-index: 0; }
+  .ob-1 { width: 480px; height: 480px; background: rgba(99,102,241,0.16); top: -160px; right: -100px; animation: obf 14s ease-in-out infinite; }
+  .ob-2 { width: 380px; height: 380px; background: rgba(244,63,94,0.09); bottom: -100px; left: -80px; animation: obf 18s ease-in-out infinite reverse; }
+  @keyframes obf { 0%,100%{transform:translate(0,0);} 50%{transform:translate(25px,-20px);} }
+
+  .onb-wrap {
+    position: relative; z-index: 10;
+    width: 100%; max-width: 680px;
+    animation: fadeUp 0.45s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(18px);} to{opacity:1;transform:translateY(0);} }
+
+  /* Logo row */
+  .onb-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; }
+  .onb-logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff; box-shadow: 0 0 20px rgba(99,102,241,0.35);
+  }
+  .onb-logo-text { font-size: 20px; font-weight: 700; color: #d0d8ef; letter-spacing: -0.3px; }
+
+  /* Stepper */
+  .onb-stepper { display: flex; align-items: center; margin-bottom: 22px; }
+  .stp-item { display: flex; align-items: center; flex: 1; }
+  .stp-circle {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .stp-circle.done  { background: var(--success); color: #fff; box-shadow: 0 0 12px rgba(16,185,129,0.4); }
+  .stp-circle.now   { background: var(--primary); color: #fff; box-shadow: 0 0 16px rgba(99,102,241,0.45); animation: stepGlow 2s ease infinite; }
+  .stp-circle.later { background: #1a2340; color: var(--text-muted); border: 1px solid var(--sidebar-border); }
+  @keyframes stepGlow { 0%,100%{box-shadow:0 0 16px rgba(99,102,241,0.45);} 50%{box-shadow:0 0 26px rgba(99,102,241,0.65);} }
+  .stp-line { flex: 1; height: 2px; margin: 0 6px; background: var(--sidebar-border); position: relative; overflow: hidden; }
+  .stp-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--success), var(--primary)); transition: width 0.55s ease; }
+
+  /* Card */
+  .onb-card {
+    background: rgba(10, 18, 34, 0.9);
+    border: 1px solid var(--sidebar-border);
+    border-radius: 18px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.025), 0 28px 56px rgba(0,0,0,0.55);
+    overflow: hidden;
+  }
+
+  .onb-head {
+    padding: 26px 30px 22px;
+    border-bottom: 1px solid var(--sidebar-border);
+    background: linear-gradient(180deg, rgba(99,102,241,0.07) 0%, transparent 100%);
+  }
+  .onb-step-tag {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.4px; color: var(--primary);
+    display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+  }
+  .step-tag-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--primary); animation: stepGlow 2s ease infinite; }
+  .onb-head h2 { font-size: 22px; font-weight: 700; color: #d0d8ef; margin-bottom: 6px; letter-spacing: -0.3px; }
+  .onb-head p  { font-size: 13px; color: #6b7fa3; line-height: 1.6; }
+
+  .onb-body { padding: 26px 30px; }
+
+  .onb-step { display: none; animation: stepSlide 0.3s ease both; }
+  .onb-step.active { display: block; }
+  @keyframes stepSlide { from{opacity:0;transform:translateX(14px);} to{opacity:1;transform:translateX(0);} }
+
+  /* ── Goal cards ── */
+  .goal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .goal-card {
+    padding: 18px 16px; border-radius: var(--radius-md);
+    border: 1.5px solid var(--sidebar-border); background: #0c1828;
+    cursor: pointer; transition: all 0.2s ease; position: relative; overflow: hidden;
+  }
+  .goal-card:hover { border-color: rgba(99,102,241,0.4); transform: translateY(-2px); }
+  .goal-card.sel   { border-color: var(--primary); background: rgba(99,102,241,0.08); }
+  .goal-card.sel .goal-tick { opacity: 1; transform: scale(1); }
+  .goal-tick {
+    position: absolute; top: 10px; right: 10px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--primary); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 8px;
+    opacity: 0; transform: scale(0.3);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .goal-icon  { width: 40px; height: 40px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; margin-bottom: 10px; }
+  .goal-title { font-size: 14px; font-weight: 700; color: #d0d8ef; margin-bottom: 4px; }
+  .goal-desc  { font-size: 12px; color: #6b7fa3; line-height: 1.5; }
+  .goal-eg    { font-size: 11px; color: #3a4a6b; margin-top: 7px; font-style: italic; }
+
+  /* ── Provider buttons ── */
+  .prov-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; margin-bottom: 16px; }
+  .prov-btn {
+    padding: 14px 10px; border-radius: var(--radius-md);
+    border: 1.5px solid var(--sidebar-border); background: #0c1828;
+    cursor: pointer; transition: all 0.2s ease;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    font-family: var(--font-body); position: relative;
+  }
+  .prov-btn:hover { border-color: rgba(99,102,241,0.4); transform: translateY(-2px); }
+  .prov-btn.linked { border-color: var(--success); background: rgba(16,185,129,0.05); }
+  .prov-btn.linked .prov-status { color: var(--success); }
+  .prov-btn.linked .prov-tick  { opacity: 1; transform: scale(1); }
+  .prov-tick {
+    position: absolute; top: 5px; right: 5px;
+    width: 15px; height: 15px; border-radius: 50%;
+    background: var(--success); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 7px;
+    opacity: 0; transform: scale(0);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .prov-icon   { font-size: 20px; }
+  .prov-name   { font-size: 11px; font-weight: 600; color: #6b7fa3; }
+  .prov-status { font-size: 9px; font-weight: 700; color: #3a4a6b; text-transform: uppercase; letter-spacing: 0.4px; }
+
+  .info-banner {
+    background: rgba(99,102,241,0.05); border: 1px solid rgba(99,102,241,0.14);
+    border-radius: var(--radius-md); padding: 12px 14px;
+    font-size: 12px; color: #6b7fa3;
+    display: flex; align-items: flex-start; gap: 9px;
+  }
+  .info-banner i { color: var(--primary); margin-top: 1px; flex-shrink: 0; }
+  .enc-badge {
+    display: flex; align-items: center; gap: 8px; margin-top: 12px;
+    padding: 9px 13px;
+    background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.12);
+    border-radius: var(--radius-md); font-size: 11px; color: #6b7fa3;
+  }
+  .enc-badge i { color: var(--success); }
+
+  /* ── Templates ── */
+  .tmpl-list { display: flex; flex-direction: column; gap: 9px; }
+  .tmpl-item {
+    padding: 14px 16px; border-radius: var(--radius-md);
+    border: 1.5px solid var(--sidebar-border); background: #0c1828;
+    cursor: pointer; transition: all 0.2s ease;
+    display: flex; align-items: center; gap: 13px;
+  }
+  .tmpl-item:hover { border-color: rgba(99,102,241,0.35); }
+  .tmpl-item.sel   { border-color: var(--primary); background: rgba(99,102,241,0.07); }
+  .tmpl-item.sel .tmpl-ring { opacity: 1; transform: scale(1); }
+  .tmpl-icon { width: 40px; height: 40px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .tmpl-info { flex: 1; }
+  .tmpl-name { font-size: 13px; font-weight: 700; color: #d0d8ef; margin-bottom: 4px; }
+  .tmpl-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .tmpl-badge { font-size: 9px; padding: 2px 7px; border-radius: 20px; font-weight: 700; background: rgba(99,102,241,0.12); color: var(--primary-light); text-transform: uppercase; letter-spacing: 0.4px; }
+  .tmpl-time  { font-size: 11px; color: #3a4a6b; display: flex; align-items: center; gap: 4px; }
+  .tmpl-ring  {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--primary); color: #fff;
+    display: flex; align-items: center; justify-content: center; font-size: 8px;
+    flex-shrink: 0; opacity: 0; transform: scale(0.4);
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  /* ── Test run ── */
+  .run-box { background: var(--sidebar-bg); border: 1px solid var(--sidebar-border); border-radius: var(--radius-md); overflow: hidden; }
+  .run-box-head {
+    padding: 12px 16px; border-bottom: 1px solid var(--sidebar-border);
+    background: rgba(0,0,0,0.25); display: flex; align-items: center; gap: 10px;
+  }
+  .run-box-title { font-size: 13px; font-weight: 600; color: #c8d3eb; flex: 1; }
+  .run-chip { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; padding: 3px 9px; border-radius: 20px; }
+  .chip-idle    { background: rgba(99,102,241,0.12); color: var(--primary-light); }
+  .chip-running { background: rgba(245,158,11,0.12); color: var(--warning); animation: chipFlick 1s ease infinite; }
+  .chip-success { background: rgba(16,185,129,0.12); color: var(--success); }
+  @keyframes chipFlick { 0%,100%{opacity:1;} 50%{opacity:0.55;} }
+
+  .run-box-body { padding: 20px; min-height: 150px; }
+  .run-idle {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; min-height: 130px; text-align: center;
+  }
+  .run-idle-icon {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: var(--primary);
+  }
+  .run-idle p { font-size: 13px; color: #6b7fa3; }
+
+  .run-log { display: flex; flex-direction: column; }
+  .rlog-row {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.03);
+    animation: logSlide 0.25s ease both;
+  }
+  .rlog-row:last-child { border-bottom: none; }
+  @keyframes logSlide { from{opacity:0;transform:translateX(-7px);} to{opacity:1;transform:translateX(0);} }
+  .rlog-dot {
+    width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 8px; margin-top: 1px;
+  }
+  .rd-ok  { background: rgba(16,185,129,0.14); color: var(--success); }
+  .rd-run { background: rgba(245,158,11,0.12); color: var(--warning); }
+  .rlog-name   { font-size: 12px; font-weight: 600; color: #c8d3eb; }
+  .rlog-detail { font-size: 11px; color: #3a4a6b; font-family: var(--font-mono); margin-top: 2px; }
+
+  .run-success {
+    display: none; flex-direction: column;
+    align-items: center; gap: 10px; text-align: center;
+    animation: successBounce 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .run-success.show { display: flex; }
+  @keyframes successBounce { from{opacity:0;transform:scale(0.82);} to{opacity:1;transform:scale(1);} }
+  .run-success-icon {
+    width: 58px; height: 58px; border-radius: 50%;
+    background: rgba(16,185,129,0.1); border: 2px solid rgba(16,185,129,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: var(--success);
+    animation: successGlow 2s ease infinite;
+  }
+  @keyframes successGlow { 0%,100%{box-shadow:0 0 20px rgba(16,185,129,0.2);} 50%{box-shadow:0 0 38px rgba(16,185,129,0.38);} }
+  .run-success h3 { font-size: 16px; font-weight: 700; color: var(--success); }
+  .run-success p  { font-size: 12px; color: #6b7fa3; line-height: 1.6; }
+  .run-checklist  { display: flex; flex-direction: column; gap: 7px; width: 100%; text-align: left; margin-top: 6px; }
+  .rcheck {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 12px; color: #6b7fa3; padding: 7px 11px;
+    border-radius: 8px; background: rgba(16,185,129,0.04); border: 1px solid rgba(16,185,129,0.1);
+  }
+  .rcheck i { color: var(--success); width: 14px; }
+
+  /* Footer */
+  .onb-foot { padding: 18px 30px; border-top: 1px solid var(--sidebar-border); display: flex; justify-content: space-between; align-items: center; }
+  .btn-skip { font-size: 12px; color: #3a4a6b; background: none; border: none; cursor: pointer; font-family: var(--font-body); padding: 4px; transition: color 0.2s; }
+  .btn-skip:hover { color: #6b7fa3; }
+
+  /* Activate button */
+  .wf-btn.activate {
+    background: var(--success) !important; color: #fff !important;
+    box-shadow: 0 0 16px rgba(16,185,129,0.3);
+  }
+  .wf-btn.activate:hover { background: #0ea271 !important; }
+
+  /* Completion */
+  .onb-done { display: none; text-align: center; padding: 44px 32px; animation: fadeUp 0.5s ease both; }
+  .onb-done.show { display: block; }
+  .done-fw { font-size: 52px; margin-bottom: 18px; display: block; animation: firePop 0.55s cubic-bezier(0.34,1.56,0.64,1) both; }
+  @keyframes firePop { from{transform:scale(0) rotate(-20deg);} to{transform:scale(1) rotate(0);} }
+  .onb-done h2 {
+    font-size: 24px; font-weight: 700; margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--primary-light), #22d3ee);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .onb-done > p { font-size: 14px; color: #6b7fa3; margin-bottom: 24px; line-height: 1.65; }
+  .done-checks { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; text-align: left; }
+
+  /* Modal */
+  .modal-back { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.72); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-back.open { display: flex; animation: mfade 0.2s ease; }
+  @keyframes mfade { from{opacity:0;} to{opacity:1;} }
+  .modal-box {
+    background: #0c1828; border: 1px solid rgba(99,102,241,0.28);
+    border-radius: 18px; padding: 26px; width: 100%; max-width: 420px; position: relative;
+    animation: mslide 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    box-shadow: 0 24px 50px rgba(0,0,0,0.6);
+  }
+  @keyframes mslide { from{transform:scale(0.9);opacity:0;} to{transform:scale(1);opacity:1;} }
+  .modal-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: var(--primary); background: rgba(99,102,241,0.1); border-radius: 20px; padding: 4px 10px; margin-bottom: 12px; }
+  .modal-box h3 { font-size: 17px; font-weight: 700; color: #d0d8ef; margin-bottom: 6px; }
+  .modal-box > p { font-size: 12px; color: #6b7fa3; line-height: 1.6; margin-bottom: 12px; }
+  .modal-access { font-size: 11px; color: #6b7fa3; margin-bottom: 14px; display: flex; align-items: flex-start; gap: 6px; }
+  .modal-access i { color: var(--primary); margin-top: 2px; flex-shrink: 0; }
+  .modal-close { position: absolute; top: 14px; right: 14px; width: 26px; height: 26px; border-radius: 7px; background: rgba(255,255,255,0.05); border: none; color: #3a4a6b; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+  .modal-close:hover { background: rgba(255,255,255,0.1); color: #c8d3eb; }
+  .modal-field { margin-bottom: 12px; }
+  .modal-label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: #6b7fa3; margin-bottom: 5px; }
+  .modal-input { width: 100%; padding: 9px 13px; background: rgba(0,0,0,0.35); color: #d0d8ef; border: 1px solid var(--sidebar-border); border-radius: var(--radius-md); font-family: var(--font-body); font-size: 13px; transition: border-color 0.2s; }
+  .modal-input:focus { outline: none; border-color: var(--primary); }
+  .modal-input::placeholder { color: #2a3a55; }
+  .modal-btns { display: flex; gap: 9px; margin-top: 16px; }
+
+  .btn-spin { width: 13px; height: 13px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); border-top-color: white; animation: spin 0.7s linear infinite; display: inline-block; }
+
+  @media (max-width: 600px) {
+    .onb-head, .onb-body, .onb-foot { padding-left: 18px; padding-right: 18px; }
+    .goal-grid { grid-template-columns: 1fr; }
+    .prov-grid { grid-template-columns: repeat(2,1fr); }
+    .onb-head h2 { font-size: 19px; }
+    .modal-box { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ob ob-1"></div>
+<div class="ob ob-2"></div>
+
+<div class="onb-wrap">
+
+  <div class="onb-logo">
+    <div class="onb-logo-icon"><i class="fas fa-microchip"></i></div>
+    <span class="onb-logo-text">CloudPilot</span>
+  </div>
+
+  <div class="onb-stepper">
+    <div class="stp-item"><div class="stp-circle now" id="sc1">1</div></div>
+    <div class="stp-line"><div class="stp-fill" id="sf1" style="width:0"></div></div>
+    <div class="stp-item"><div class="stp-circle later" id="sc2">2</div></div>
+    <div class="stp-line"><div class="stp-fill" id="sf2" style="width:0"></div></div>
+    <div class="stp-item"><div class="stp-circle later" id="sc3">3</div></div>
+    <div class="stp-line"><div class="stp-fill" id="sf3" style="width:0"></div></div>
+    <div class="stp-item"><div class="stp-circle later" id="sc4">4</div></div>
+  </div>
+
+  <div class="onb-card" id="onbCard">
+
+    <!-- STEP 1 -->
+    <div class="onb-head" id="h1">
+      <div class="onb-step-tag"><div class="step-tag-dot"></div>Step 1 of 4</div>
+      <h2>What do you want to automate?</h2>
+      <p>Pick a goal and we'll suggest the right setup for you. You can always change this later.</p>
+    </div>
+    <div class="onb-body" id="b1">
+      <div class="onb-step active" id="s1">
+        <div class="goal-grid">
+          <div class="goal-card" onclick="pickGoal(this,'cost')">
+            <div class="goal-tick"><i class="fas fa-check"></i></div>
+            <div class="goal-icon" style="background:rgba(245,158,11,0.1);color:var(--warning)"><i class="fas fa-dollar-sign"></i></div>
+            <div class="goal-title">Cost Alerts</div>
+            <div class="goal-desc">Monitor cloud spend and alert when budgets are exceeded.</div>
+            <div class="goal-eg">e.g. "Alert me when AWS bill exceeds $500"</div>
+          </div>
+          <div class="goal-card" onclick="pickGoal(this,'storage')">
+            <div class="goal-tick"><i class="fas fa-check"></i></div>
+            <div class="goal-icon" style="background:rgba(34,211,238,0.1);color:#22d3ee"><i class="fas fa-hdd"></i></div>
+            <div class="goal-title">Storage Cleanup</div>
+            <div class="goal-desc">Automatically delete old files, snapshots, and unused resources.</div>
+            <div class="goal-eg">e.g. "Delete S3 files older than 90 days"</div>
+          </div>
+          <div class="goal-card" onclick="pickGoal(this,'security')">
+            <div class="goal-tick"><i class="fas fa-check"></i></div>
+            <div class="goal-icon" style="background:rgba(244,63,94,0.1);color:var(--accent)"><i class="fas fa-shield-alt"></i></div>
+            <div class="goal-title">Security Monitoring</div>
+            <div class="goal-desc">Watch for unusual access patterns and compliance issues.</div>
+            <div class="goal-eg">e.g. "Alert on IAM policy changes"</div>
+          </div>
+          <div class="goal-card" onclick="pickGoal(this,'custom')">
+            <div class="goal-tick"><i class="fas fa-check"></i></div>
+            <div class="goal-icon" style="background:rgba(99,102,241,0.1);color:var(--primary)"><i class="fas fa-magic"></i></div>
+            <div class="goal-title">Custom Workflow</div>
+            <div class="goal-desc">Build your own automation or browse all templates.</div>
+            <div class="goal-eg">e.g. Any custom multi-step process</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="onb-foot" id="f1">
+      <button class="btn-skip" onclick="go(2)">Skip for now</button>
+      <button class="wf-btn primary" id="n1" onclick="go(2)" disabled>Continue <i class="fas fa-arrow-right"></i></button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="onb-head" id="h2" style="display:none">
+      <div class="onb-step-tag"><div class="step-tag-dot"></div>Step 2 of 4</div>
+      <h2>Connect your accounts</h2>
+      <p>We need read access to your cloud providers. Keys are encrypted with AES-256 and never exposed.</p>
+    </div>
+    <div class="onb-body" id="b2" style="display:none">
+      <div class="onb-step" id="s2">
+        <div class="prov-grid">
+          <div class="prov-btn" id="pb-aws" onclick="openModal('aws')">
+            <div class="prov-tick"><i class="fas fa-check"></i></div>
+            <div class="prov-icon" style="color:#f97316"><i class="fab fa-aws"></i></div>
+            <div class="prov-name">AWS</div><div class="prov-status" id="ps-aws">Not connected</div>
+          </div>
+          <div class="prov-btn" id="pb-gcp" onclick="openModal('gcp')">
+            <div class="prov-tick"><i class="fas fa-check"></i></div>
+            <div class="prov-icon" style="color:#3b82f6"><i class="fab fa-google"></i></div>
+            <div class="prov-name">GCP</div><div class="prov-status" id="ps-gcp">Not connected</div>
+          </div>
+          <div class="prov-btn" id="pb-azure" onclick="openModal('azure')">
+            <div class="prov-tick"><i class="fas fa-check"></i></div>
+            <div class="prov-icon" style="color:#8b5cf6"><i class="fab fa-microsoft"></i></div>
+            <div class="prov-name">Azure</div><div class="prov-status" id="ps-azure">Not connected</div>
+          </div>
+          <div class="prov-btn" id="pb-slack" onclick="openModal('slack')">
+            <div class="prov-tick"><i class="fas fa-check"></i></div>
+            <div class="prov-icon" style="color:var(--success)"><i class="fab fa-slack"></i></div>
+            <div class="prov-name">Slack</div><div class="prov-status" id="ps-slack">Not connected</div>
+          </div>
+          <div class="prov-btn" id="pb-github" onclick="openModal('github')">
+            <div class="prov-tick"><i class="fas fa-check"></i></div>
+            <div class="prov-icon" style="color:#c8d3eb"><i class="fab fa-github"></i></div>
+            <div class="prov-name">GitHub</div><div class="prov-status" id="ps-github">Not connected</div>
+          </div>
+          <div class="prov-btn" style="opacity:0.35;cursor:default">
+            <div class="prov-icon" style="color:#3a4a6b"><i class="fas fa-plus"></i></div>
+            <div class="prov-name">More</div><div class="prov-status">Coming soon</div>
+          </div>
+        </div>
+        <div class="info-banner">
+          <i class="fas fa-info-circle"></i>
+          Connect at least one account to import templates. Add more later in <strong style="color:#a8b9d9">&nbsp;Connected Accounts</strong>.
+        </div>
+        <div class="enc-badge"><i class="fas fa-lock"></i> Credentials are encrypted with AES-256-GCM before storage and never returned to the frontend.</div>
+      </div>
+    </div>
+    <div class="onb-foot" id="f2" style="display:none">
+      <button class="wf-btn secondary" onclick="go(1)"><i class="fas fa-arrow-left"></i> Back</button>
+      <div style="display:flex;gap:9px;align-items:center">
+        <button class="btn-skip" onclick="go(3)">Skip</button>
+        <button class="wf-btn primary" onclick="go(3)">Continue <i class="fas fa-arrow-right"></i></button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="onb-head" id="h3" style="display:none">
+      <div class="onb-step-tag"><div class="step-tag-dot"></div>Step 3 of 4</div>
+      <h2>Pick your first automation</h2>
+      <p>Pre-built templates matched to your goal. Each takes under 15 minutes to set up.</p>
+    </div>
+    <div class="onb-body" id="b3" style="display:none">
+      <div class="onb-step" id="s3">
+        <div class="tmpl-list" id="tmplList"></div>
+      </div>
+    </div>
+    <div class="onb-foot" id="f3" style="display:none">
+      <button class="wf-btn secondary" onclick="go(2)"><i class="fas fa-arrow-left"></i> Back</button>
+      <button class="wf-btn primary" id="n3" onclick="go(4)" disabled>Continue <i class="fas fa-arrow-right"></i></button>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="onb-head" id="h4" style="display:none">
+      <div class="onb-step-tag"><div class="step-tag-dot"></div>Step 4 of 4</div>
+      <h2>Run a test — see it work</h2>
+      <p>We'll trigger your automation with safe test data. Nothing changes in your real cloud accounts.</p>
+    </div>
+    <div class="onb-body" id="b4" style="display:none">
+      <div class="onb-step" id="s4">
+        <div class="run-box">
+          <div class="run-box-head">
+            <div class="run-box-title" id="runTitle">Selected Template</div>
+            <div class="run-chip chip-idle" id="runChip">Ready</div>
+          </div>
+          <div class="run-box-body">
+            <div class="run-idle" id="runIdle">
+              <div class="run-idle-icon"><i class="fas fa-play-circle"></i></div>
+              <p>Click "Run Test" to simulate your automation safely</p>
+            </div>
+            <div class="run-log" id="runLog" style="display:none"></div>
+            <div class="run-success" id="runSuccess">
+              <div class="run-success-icon"><i class="fas fa-check"></i></div>
+              <h3>Test Passed!</h3>
+              <p>Your automation ran successfully with test data. Here's what happened:</p>
+              <div class="run-checklist">
+                <div class="rcheck"><i class="fas fa-check-circle"></i> Connected to your cloud account</div>
+                <div class="rcheck"><i class="fas fa-check-circle"></i> Fetched resources (test data)</div>
+                <div class="rcheck"><i class="fas fa-check-circle"></i> Applied automation logic</div>
+                <div class="rcheck"><i class="fas fa-check-circle"></i> Notification sent to Slack</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="onb-foot" id="f4" style="display:none">
+      <button class="wf-btn secondary" onclick="go(3)"><i class="fas fa-arrow-left"></i> Back</button>
+      <div style="display:flex;gap:9px">
+        <button class="wf-btn secondary" id="btnTest" onclick="runTest()"><i class="fas fa-play"></i> Run Test</button>
+        <button class="wf-btn activate" id="btnActivate" onclick="finish()" disabled><i class="fas fa-bolt"></i> Activate Automation</button>
+      </div>
+    </div>
+
+    <!-- DONE (replaces steps) -->
+    <div class="onb-done" id="onbDone">
+      <span class="done-fw">🎉</span>
+      <h2>Your first automation is live!</h2>
+      <p>CloudPilot is now monitoring your cloud and will alert you when something needs attention.</p>
+      <div class="done-checks">
+        <div class="rcheck"><i class="fas fa-check-circle"></i> Account connected</div>
+        <div class="rcheck"><i class="fas fa-check-circle"></i> Template imported &amp; configured</div>
+        <div class="rcheck"><i class="fas fa-check-circle"></i> Test run successful</div>
+        <div class="rcheck"><i class="fas fa-check-circle"></i> Automation activated</div>
+      </div>
+      <button class="wf-btn primary" style="width:100%;justify-content:center;padding:13px" onclick="toDashboard()">
+        Go to Dashboard <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+
+  </div><!-- /onb-card -->
+</div><!-- /onb-wrap -->
+
+<!-- Provider connect modal -->
+<div class="modal-back" id="connModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-badge"><i class="fas fa-lock"></i>&nbsp;<span id="mBadge">Connect</span></div>
+    <h3 id="mTitle">Connect Account</h3>
+    <p id="mDesc"></p>
+    <div class="modal-access"><i class="fas fa-info-circle"></i><span id="mAccess"></span></div>
+    <div id="mFields"></div>
+    <div class="enc-badge" style="margin-top:0"><i class="fas fa-shield-alt"></i> AES-256-GCM encrypted. Keys are never returned to the frontend after saving.</div>
+    <div class="modal-btns">
+      <button class="wf-btn secondary" onclick="closeModal()" style="flex:1">Cancel</button>
+      <button class="wf-btn primary" id="mSave" onclick="saveConn()" style="flex:2"><i class="fas fa-lock"></i> Save &amp; Test Connection</button>
+    </div>
+  </div>
+</div>
+
+<!-- Auth guard + Supabase integration -->
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+  const cfgRes = await fetch('/api/config').then(r => r.json()).catch(() => ({}));
+
+  if (cfgRes.supabase?.url && cfgRes.supabase?.anonKey) {
+    const sb = createClient(cfgRes.supabase.url, cfgRes.supabase.anonKey);
+    const { data: { session } } = await sb.auth.getSession();
+
+    // Redirect to login if not authenticated (and not demo mode)
+    if (!session && !cfgRes.demoMode) {
+      window.location.href = 'login.html';
+    }
+
+    // Skip onboarding if already completed
+    if (session?.user?.user_metadata?.onboarding_complete || localStorage.getItem('cp_onboarding_done')) {
+      window.location.href = 'index.html';
+    }
+
+    window._supabase = sb;
+    window._session  = session;
+  }
+
+  // Called when user clicks "Activate Automation" and we're done
+  window._markOnboardingDone = async () => {
+    try {
+      if (window._supabase && window._session) {
+        await window._supabase.auth.updateUser({ data: { onboarding_complete: true } });
+      }
+    } catch (_) {}
+    localStorage.setItem('cp_onboarding_done', '1');
+  };
+</script>
+
+<script>
+/* ────────────────────────
+   State
+──────────────────────── */
+let curStep = 1;
+let goal = null;
+let template = null;
+let curProv = null;
+
+const TEMPLATES = {
+  cost:     [
+    {id:'aws-cost-alert', name:'AWS Cost Alert',         icon:'fab fa-aws',       color:'#f97316', req:['aws','slack'], time:'~5 min', badge:'Cost'},
+    {id:'gcp-billing',    name:'GCP Billing Monitor',    icon:'fab fa-google',     color:'#3b82f6', req:['gcp'],        time:'~7 min', badge:'Cost'},
+    {id:'azure-budget',   name:'Azure Budget Alerts',    icon:'fab fa-microsoft',  color:'#8b5cf6', req:['azure'],      time:'~5 min', badge:'Cost'},
+  ],
+  storage:  [
+    {id:'aws-s3-backup',  name:'AWS S3 Backup Pipeline', icon:'fab fa-aws',       color:'#f97316', req:['aws'],  time:'~8 min', badge:'Storage'},
+    {id:'gcp-storage',    name:'GCP Storage Cleanup',    icon:'fab fa-google',     color:'#3b82f6', req:['gcp'], time:'~6 min', badge:'Storage'},
+  ],
+  security: [
+    {id:'aws-iam',        name:'AWS IAM Policy Monitor', icon:'fab fa-aws',        color:'#f97316', req:['aws','slack'], time:'~6 min', badge:'Security'},
+    {id:'multi-health',   name:'Multi-Cloud Health Check',icon:'fas fa-cloud',     color:'var(--primary)', req:['aws','gcp','azure'], time:'~10 min', badge:'Multi-cloud'},
+  ],
+  custom:   [
+    {id:'aws-s3-backup',  name:'AWS S3 Backup Pipeline', icon:'fab fa-aws',       color:'#f97316', req:['aws'],   time:'~8 min', badge:'Storage'},
+    {id:'slack-notif',    name:'Slack Incident Notifier', icon:'fab fa-slack',     color:'var(--success)', req:['slack'], time:'~5 min', badge:'Alerts'},
+    {id:'multi-health',   name:'Multi-Cloud Health Check',icon:'fas fa-cloud',     color:'var(--primary)', req:['aws','gcp','azure'], time:'~10 min', badge:'Multi-cloud'},
+  ],
+};
+
+const PROVS = {
+  aws:    { name:'AWS',          desc:'We need your Access Key to read resource usage and billing data. A read-only IAM policy is recommended.',             access:'Read-only: AmazonEC2ReadOnlyAccess + AWSBillingReadOnlyAccess',
+            fields:[{id:'awsKey',l:'Access Key ID',p:'AKIAIOSFODNN7EXAMPLE'},{id:'awsSec',l:'Secret Access Key',p:'••••••••',t:'password'},{id:'awsReg',l:'Region',p:'us-east-1'}] },
+  gcp:    { name:'Google Cloud', desc:'We need your service account credentials to read GCP resource and billing data.',                                      access:'roles/viewer or specific read-only roles recommended.',
+            fields:[{id:'gcpProj',l:'Project ID',p:'my-project-123'},{id:'gcpEmail',l:'Service Account Email',p:'sa@project.iam.gserviceaccount.com'}] },
+  azure:  { name:'Azure',        desc:'Enter your Azure service principal credentials. A Reader role at subscription level is sufficient.',                    access:'Assign Reader role at subscription scope.',
+            fields:[{id:'azTen',l:'Tenant ID',p:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'},{id:'azCli',l:'Client ID',p:'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'},{id:'azSec',l:'Client Secret',p:'••••••••',t:'password'}] },
+  slack:  { name:'Slack',        desc:'Add your Slack Bot Token so CloudPilot can send notifications to your workspace channels.',                            access:'Bot needs: chat:write, channels:read permissions.',
+            fields:[{id:'slkTok',l:'Bot OAuth Token',p:'xoxb-xxxxxxxxxxxx',t:'password'},{id:'slkChan',l:'Default Channel (optional)',p:'#cloud-alerts'}] },
+  github: { name:'GitHub',       desc:'Add a Personal Access Token to monitor your repositories and receive alerts on important events.',                      access:'Scope: repo:read, read:org (if org repos needed).',
+            fields:[{id:'ghTok',l:'Personal Access Token',p:'ghp_xxxxxxxxxxxx',t:'password'}] },
+};
+
+/* ────────────────────────
+   Stepper
+──────────────────────── */
+function updateStepper(n) {
+  for (let i = 1; i <= 4; i++) {
+    const sc = document.getElementById('sc' + i);
+    if (i < n)       { sc.className = 'stp-circle done';  sc.innerHTML = '<i class="fas fa-check" style="font-size:9px"></i>'; }
+    else if (i === n){ sc.className = 'stp-circle now';   sc.textContent = i; }
+    else             { sc.className = 'stp-circle later'; sc.textContent = i; }
+    if (i < 4) document.getElementById('sf' + i).style.width = i < n ? '100%' : '0';
+  }
+}
+
+/* ────────────────────────
+   Navigation
+──────────────────────── */
+function go(n) {
+  ['h','b','f'].forEach(p => {
+    const prev = document.getElementById(p + curStep); if (prev) prev.style.display = 'none';
+    const next = document.getElementById(p + n);       if (next) next.style.display = '';
+  });
+  const ss = document.getElementById('s' + n);
+  if (ss) { ss.classList.remove('active'); void ss.offsetWidth; ss.classList.add('active'); }
+  updateStepper(n);
+  curStep = n;
+  if (n === 3) renderTemplates();
+}
+window.go = go;
+
+/* ────────────────────────
+   Step 1
+──────────────────────── */
+window.pickGoal = function(el, g) {
+  document.querySelectorAll('.goal-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  goal = g;
+  document.getElementById('n1').disabled = false;
+};
+
+/* ────────────────────────
+   Step 2 — modal
+──────────────────────── */
+window.openModal = function(prov) {
+  curProv = prov;
+  const p = PROVS[prov];
+  document.getElementById('mBadge').textContent  = 'Connect ' + p.name;
+  document.getElementById('mTitle').textContent  = 'Connect ' + p.name;
+  document.getElementById('mDesc').textContent   = p.desc;
+  document.getElementById('mAccess').textContent = p.access;
+  document.getElementById('mFields').innerHTML   = p.fields.map(f => `
+    <div class="modal-field">
+      <label class="modal-label">${f.l}</label>
+      <input type="${f.t||'text'}" class="modal-input" id="mf-${f.id}" placeholder="${f.p}" autocomplete="off">
+    </div>`).join('');
+  document.getElementById('connModal').classList.add('open');
+};
+
+window.closeModal = function() {
+  document.getElementById('connModal').classList.remove('open');
+  curProv = null;
+};
+
+window.saveConn = function() {
+  const btn = document.getElementById('mSave');
+  btn.innerHTML = '<span class="btn-spin"></span>&nbsp;Testing connection…';
+  btn.disabled = true;
+
+  // In production: call api.addCredential() with the form values.
+  // Here we simulate a 1.5s test, then mark connected.
+  setTimeout(() => {
+    document.getElementById('pb-' + curProv).classList.add('linked');
+    document.getElementById('ps-' + curProv).textContent = 'Connected ✓';
+    closeModal();
+    btn.innerHTML = '<i class="fas fa-lock"></i> Save & Test Connection';
+    btn.disabled = false;
+  }, 1600);
+};
+
+document.getElementById('connModal').addEventListener('click', e => { if (e.target.id === 'connModal') closeModal(); });
+
+/* ────────────────────────
+   Step 3
+──────────────────────── */
+function renderTemplates() {
+  const tmpls = TEMPLATES[goal || 'custom'];
+  document.getElementById('tmplList').innerHTML = tmpls.map(t => `
+    <div class="tmpl-item" onclick="pickTemplate(this,'${t.id}','${t.name}')">
+      <div class="tmpl-icon" style="background:${t.color}18;color:${t.color}"><i class="${t.icon}"></i></div>
+      <div class="tmpl-info">
+        <div class="tmpl-name">${t.name}</div>
+        <div class="tmpl-meta">
+          ${t.req.map(r=>`<span class="tmpl-badge">${r.toUpperCase()}</span>`).join('')}
+          <span class="tmpl-time"><i class="fas fa-clock" style="font-size:9px"></i>&nbsp;${t.time}</span>
+        </div>
+      </div>
+      <div class="tmpl-ring"><i class="fas fa-check"></i></div>
+    </div>`).join('');
+}
+
+window.pickTemplate = function(el, id, name) {
+  document.querySelectorAll('.tmpl-item').forEach(i => i.classList.remove('sel'));
+  el.classList.add('sel');
+  template = id;
+  document.getElementById('n3').disabled = false;
+  document.getElementById('runTitle').textContent = name;
+};
+
+/* ────────────────────────
+   Step 4 — test run
+──────────────────────── */
+const LOG_STEPS = [
+  { name:'Preparing test environment',         detail:'Using safe sandbox data…',           delay:0    },
+  { name:'Authenticating with cloud provider', detail:'Verifying credentials…',             delay:880  },
+  { name:'Fetching resource list',             detail:'Reading resources (test mode)…',     delay:1750 },
+  { name:'Applying automation rules',          detail:'Checking conditions and filters…',   delay:2620 },
+  { name:'Generating execution report',        detail:'23 resources matched criteria…',     delay:3380 },
+  { name:'Sending notification',               detail:'Posted summary to #cloud-alerts…',   delay:4150 },
+];
+
+window.runTest = function() {
+  const btn  = document.getElementById('btnTest');
+  const chip = document.getElementById('runChip');
+  const logEl= document.getElementById('runLog');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="btn-spin"></span> Running…';
+  document.getElementById('runIdle').style.display = 'none';
+  document.getElementById('runSuccess').classList.remove('show');
+  logEl.innerHTML = '';
+  logEl.style.display = 'flex';
+  logEl.style.flexDirection = 'column';
+  chip.className = 'run-chip chip-running';
+  chip.textContent = 'Running';
+
+  LOG_STEPS.forEach((step, i) => {
+    setTimeout(() => {
+      const prev = logEl.querySelector(`[data-i="${i-1}"]`);
+      if (prev) { prev.querySelector('.rlog-dot').className = 'rlog-dot rd-ok'; prev.querySelector('.rlog-dot').innerHTML = '<i class="fas fa-check"></i>'; }
+
+      const row = document.createElement('div');
+      row.className = 'rlog-row'; row.dataset.i = i;
+      row.innerHTML = `<div class="rlog-dot rd-run"><i class="fas fa-circle-notch fa-spin"></i></div><div><div class="rlog-name">${step.name}</div><div class="rlog-detail">${step.detail}</div></div>`;
+      logEl.appendChild(row);
+      row.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+      if (i === LOG_STEPS.length - 1) {
+        setTimeout(() => {
+          row.querySelector('.rlog-dot').className = 'rlog-dot rd-ok';
+          row.querySelector('.rlog-dot').innerHTML = '<i class="fas fa-check"></i>';
+          chip.className   = 'run-chip chip-success';
+          chip.textContent = 'Success';
+          logEl.style.display = 'none';
+          document.getElementById('runSuccess').classList.add('show');
+          document.getElementById('btnActivate').disabled = false;
+          btn.innerHTML = '<i class="fas fa-redo"></i> Run Again';
+          btn.disabled  = false;
+          btn.onclick = () => { document.getElementById('runSuccess').classList.remove('show'); logEl.innerHTML=''; logEl.style.display='flex'; runTest(); };
+        }, 680);
+      }
+    }, step.delay);
+  });
+};
+
+window.finish = async function() {
+  await (window._markOnboardingDone?.() ?? Promise.resolve());
+  document.querySelectorAll('.onb-head,.onb-body,.onb-foot').forEach(e => e.style.display = 'none');
+  document.getElementById('onbDone').classList.add('show');
+};
+
+window.toDashboard = () => { window.location.href = 'index.html'; };
+</script>
+</body>
+</html>

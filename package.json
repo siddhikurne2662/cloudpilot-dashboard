@@ -13,11 +13,18 @@
     "seed": "node scripts/seed-templates.js",
     "test": "echo \"No tests yet\" && exit 0"
   },
-  "keywords": ["automation", "n8n", "workflow", "saas", "cloud", "supabase"],
+  "keywords": [
+    "automation",
+    "n8n",
+    "workflow",
+    "saas",
+    "cloud",
+    "supabase"
+  ],
   "author": "Siddhi",
   "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/supabase-js": "^2.103.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^17.2.3",

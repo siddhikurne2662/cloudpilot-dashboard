@@ -8,6 +8,8 @@ import { templatesView } from './views/templates.js';
 import { credentialsView } from './views/credentials.js';
 import { settingsView } from './views/settings.js';
 import { timelineView } from './views/timeline.js';
+import { workflowsView } from './views/workflows.js';
+import { runHistoryView } from './views/runhistory.js';
 
 let supabase;
 let currentUser;
@@ -90,6 +92,9 @@ async function init() {
   defineRoute('/settings', async () => { setActiveNav('settings'); await settingsView(); });
   defineRoute('/execution', async (params) => { setActiveNav('execution'); await timelineView(params); });
   defineRoute('/workflow', async (params) => { setActiveNav('dashboard'); await timelineView(params); });
+  defineRoute('/workflows', async () => { setActiveNav('workflows'); await workflowsView(); });
+  defineRoute('/run-history', async (params) => { setActiveNav('run-history'); await runHistoryView(params); });
+  defineRoute('/executions', async (params) => { setActiveNav('executions'); await runHistoryView(params); });
 
   initRouter();
 }
@@ -117,6 +122,8 @@ function updateUserUI(user) {
 function setupNavigation() {
   const navMap = {
     'Dashboard': '/dashboard',
+    'Workflows': '/workflows',
+    'Executions': '/executions',
     'Templates': '/templates',
     'Credentials': '/credentials',
     'Settings': '/settings',
